@@ -130,6 +130,13 @@ a {
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
 }
 
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .btn-small {
   padding: 0.6rem 1rem;
 }
@@ -168,6 +175,43 @@ a {
   color: var(--white);
   padding: 6.2rem 0 5rem;
   min-height: 78svh;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(2, 6, 23, 0.84) 5%, rgba(15, 23, 42, 0.5) 48%, rgba(2, 132, 199, 0.45) 100%);
+  z-index: 1;
+}
+
+.hero-slides {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-slides img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  animation: heroFade 21s infinite;
+}
+
+.hero-slides img:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.hero-slides img:nth-child(2) {
+  animation-delay: 7s;
+}
+
+.hero-slides img:nth-child(3) {
+  animation-delay: 14s;
 }
 
 .hero-grid {
@@ -175,6 +219,8 @@ a {
   grid-template-columns: 1.2fr 0.8fr;
   gap: 2rem;
   align-items: start;
+  position: relative;
+  z-index: 2;
 }
 
 .eyebrow {
@@ -218,6 +264,27 @@ h1 {
   will-change: transform;
 }
 
+.hero-showcase {
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-showcase img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.hero-showcase p {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  background: rgba(15, 23, 42, 0.68);
+  color: #f8fafc;
+  font-size: 0.92rem;
+}
+
 .hero-copy,
 .hero-card,
 .lead-form,
@@ -233,7 +300,10 @@ h1 {
 .steps article:hover,
 .reviews-grid blockquote:hover,
 .contact-card:hover,
-.lead-form:hover {
+.lead-form:hover,
+.fleet-card:hover,
+.trust-card:hover,
+.pricing-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 34px rgba(15, 23, 42, 0.13);
 }
@@ -270,6 +340,97 @@ h1 {
   gap: 1rem;
 }
 
+.trust-section {
+  background: #f1f5f9;
+}
+
+.trust-grid,
+.pricing-grid,
+.fleet-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.trust-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.pricing-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.fleet-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.trust-card,
+.pricing-card,
+.fleet-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+}
+
+.trust-card,
+.pricing-card {
+  padding: 1rem;
+}
+
+.price {
+  margin: 0.25rem 0 0.6rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0369a1;
+}
+
+.pricing-card ul {
+  margin: 0;
+  padding-left: 1rem;
+  color: #334155;
+}
+
+.discount-note {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.fleet-card {
+  overflow: hidden;
+}
+
+.fleet-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.fleet-body {
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.fleet-body h3,
+.fleet-price,
+.fleet-specs {
+  margin: 0;
+}
+
+.fleet-price {
+  color: #0369a1;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.fleet-specs {
+  color: #475569;
+  font-size: 0.93rem;
+}
+
 .lead-form {
   background: #ffffff;
   border: 1px solid var(--border);
@@ -294,18 +455,34 @@ h1 {
 }
 
 .lead-form input,
-.lead-form textarea {
+.lead-form textarea,
+.lead-form select {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.72rem 0.8rem;
   font: inherit;
+  background: #ffffff;
 }
 
 .lead-form input:focus,
-.lead-form textarea:focus {
+.lead-form textarea:focus,
+.lead-form select:focus {
   outline: 2px solid #bae6fd;
   border-color: #7dd3fc;
+}
+
+.availability-box {
+  margin-top: -0.2rem;
+  border: 1px dashed #7dd3fc;
+  border-radius: 10px;
+  background: #f0f9ff;
+  color: #0f172a;
+  padding: 0.75rem;
+}
+
+.availability-box p {
+  margin: 0.2rem 0;
 }
 
 .reveal-item {
@@ -483,8 +660,14 @@ cite {
   .contact-grid,
   .features,
   .steps,
-  .reviews-grid {
+  .reviews-grid,
+  .pricing-grid,
+  .trust-grid {
     grid-template-columns: 1fr;
+  }
+
+  .fleet-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .field-grid {
@@ -522,6 +705,10 @@ cite {
     grid-template-columns: 1fr;
   }
 
+  .fleet-grid {
+    grid-template-columns: 1fr;
+  }
+
   .footer-wrap {
     min-height: auto;
     padding: 0.9rem 0;
@@ -540,5 +727,16 @@ cite {
   .reveal-item {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes heroFade {
+  0%,
+  30% {
+    opacity: 1;
+  }
+  35%,
+  100% {
+    opacity: 0;
   }
 }

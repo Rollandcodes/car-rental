@@ -43,6 +43,7 @@
       <nav class="nav">
         <a href="#why-us" data-i18n="navWhyUs">Why Us</a>
         <a href="#how-it-works" data-i18n="navHow">How It Works</a>
+        <a href="fleet.html" data-i18n="navFleet">Fleet</a>
         <a href="#book-now" data-i18n="navBook">Book Now</a>
         <a href="#reviews" data-i18n="navReviews">Reviews</a>
         <a href="#contact" data-i18n="navContact">Contact</a>
@@ -59,6 +60,11 @@
 
   <main>
     <section class="hero">
+      <div class="hero-slides" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80" alt="" loading="eager" fetchpriority="high" />
+        <img src="https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1600&q=80" alt="" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1549924231-f129b911e442?auto=format&fit=crop&w=1600&q=80" alt="" loading="lazy" />
+      </div>
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="eyebrow" data-i18n="heroEyebrow">5.0 ★ Local Rating</p>
@@ -81,6 +87,10 @@
         </div>
 
         <aside class="hero-card">
+          <div class="hero-showcase">
+            <img src="images/owner.jpeg" alt="Dizgin premium rental vehicle" loading="lazy" decoding="async" />
+            <p>Premium cars ready for Lefke roads</p>
+          </div>
           <h2 data-i18n="quickFunnel">Quick Booking Funnel</h2>
           <ol>
             <li data-i18n="step1"><strong>Step 1:</strong> Call or WhatsApp us</li>
@@ -89,6 +99,30 @@
           </ol>
           <a class="btn btn-primary btn-full" href="#book-now" data-i18n="startBooking">Start Booking</a>
         </aside>
+      </div>
+    </section>
+
+    <section class="section trust-section" id="trust">
+      <div class="container">
+        <h2>Why customers trust us</h2>
+        <div class="trust-grid">
+          <article class="trust-card">
+            <h3>Licensed &amp; Insured</h3>
+            <p>Fully compliant rental operations with clear procedures and documentation.</p>
+          </article>
+          <article class="trust-card">
+            <h3>Free Pickup / Delivery</h3>
+            <p>Convenient pickup and return support in key areas around Lefke and Gemikonağı.</p>
+          </article>
+          <article class="trust-card">
+            <h3>24/7 Support</h3>
+            <p>Fast help through phone and WhatsApp whenever you need assistance.</p>
+          </article>
+          <article class="trust-card">
+            <h3>8+ Years in Business</h3>
+            <p>Trusted by local residents, students, and travelers across Northern Cyprus.</p>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -135,6 +169,45 @@
       </div>
     </section>
 
+    <section class="section" id="pricing">
+      <div class="container">
+        <h2>Transparent Daily Pricing</h2>
+        <p class="subtitle">Simple tiers with clear long-term discounts.</p>
+        <div class="pricing-grid">
+          <article class="pricing-card">
+            <h3>Economy</h3>
+            <p class="price">€35/day</p>
+            <ul>
+              <li>Best for city driving</li>
+              <li>Fuel efficient</li>
+              <li>2–5 seats</li>
+            </ul>
+          </article>
+          <article class="pricing-card">
+            <h3>Standard</h3>
+            <p class="price">€50/day</p>
+            <ul>
+              <li>Balanced comfort and value</li>
+              <li>Automatic options</li>
+              <li>5 seats</li>
+            </ul>
+          </article>
+          <article class="pricing-card">
+            <h3>SUV</h3>
+            <p class="price">€70/day</p>
+            <ul>
+              <li>Higher clearance and space</li>
+              <li>Family-ready storage</li>
+              <li>5–7 seats</li>
+            </ul>
+          </article>
+        </div>
+        <div class="discount-note">
+          <strong>Long-term discounts:</strong> 7+ days: 8% off · 14+ days: 12% off · 30+ days: custom monthly offer.
+        </div>
+      </div>
+    </section>
+
     <section class="section" id="book-now">
       <div class="container">
         <h2 data-i18n="formTitle">Request a Rental Offer</h2>
@@ -151,11 +224,11 @@
             </label>
             <label>
               <span data-i18n="fieldPickupDate">Pickup Date</span>
-              <input type="date" name="pickupDate" required />
+              <input type="date" name="pickupDate" id="pickupDate" required />
             </label>
             <label>
               <span data-i18n="fieldReturnDate">Return Date</span>
-              <input type="date" name="returnDate" required />
+              <input type="date" name="returnDate" id="returnDate" required />
             </label>
             <label>
               <span data-i18n="fieldPickupLoc">Pickup Location</span>
@@ -163,14 +236,35 @@
             </label>
             <label>
               <span data-i18n="fieldCarType">Preferred Car Type</span>
-              <input type="text" name="carType" data-i18n-placeholder="placeholderCarType" placeholder="Economy / SUV / Automatic" />
+              <select name="carType" id="carTypeSelect" required>
+                <option value="">Select a car</option>
+                <option value="Toyota Yaris" data-rate="35">Toyota Yaris — €35/day</option>
+                <option value="Hyundai i20" data-rate="36">Hyundai i20 — €36/day</option>
+                <option value="Skoda Octavia" data-rate="48">Skoda Octavia — €48/day</option>
+                <option value="Volkswagen Passat" data-rate="52">Volkswagen Passat — €52/day</option>
+                <option value="Nissan Qashqai" data-rate="68">Nissan Qashqai — €68/day</option>
+                <option value="Kia Sportage" data-rate="72">Kia Sportage — €72/day</option>
+                <option value="Mercedes C-Class" data-rate="95">Mercedes C-Class — €95/day</option>
+              </select>
             </label>
+            <label>
+              <span>Daily Price</span>
+              <input type="text" id="dailyPrice" value="€0/day" readonly />
+            </label>
+            <label>
+              <span>Estimated Total</span>
+              <input type="text" id="estimatedTotal" value="€0" readonly />
+            </label>
+          </div>
+          <div class="availability-box">
+            <p><strong>Availability calendar:</strong> unavailable dates are blocked by selected vehicle schedule.</p>
+            <p id="availabilityInfo">Select a car and dates to check availability.</p>
           </div>
           <label>
             <span data-i18n="fieldNotes">Additional Notes</span>
             <textarea name="notes" rows="4" data-i18n-placeholder="placeholderNotes" placeholder="Any details about your trip"></textarea>
           </label>
-          <button class="btn btn-primary" type="submit" data-i18n="formSubmit">Send Request on WhatsApp</button>
+          <button class="btn btn-primary" type="submit" id="leadSubmit" data-i18n="formSubmit">Send Request on WhatsApp</button>
         </form>
       </div>
     </section>

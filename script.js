@@ -1,12 +1,31 @@
 const yearElement = document.getElementById("year");
 const languageButtons = document.querySelectorAll(".lang-btn");
 const leadForm = document.getElementById("leadForm");
+const carTypeSelect = document.getElementById("carTypeSelect");
+const pickupDateInput = document.getElementById("pickupDate");
+const returnDateInput = document.getElementById("returnDate");
+const dailyPriceInput = document.getElementById("dailyPrice");
+const estimatedTotalInput = document.getElementById("estimatedTotal");
+const availabilityInfo = document.getElementById("availabilityInfo");
+const leadSubmitButton = document.getElementById("leadSubmit");
+const bookCarButtons = document.querySelectorAll(".book-car-btn");
 const storageLanguageKey = "preferredLanguage";
+
+const unavailableRangesByCar = {
+  "Toyota Yaris": [{ start: "2026-02-20", end: "2026-02-23" }, { start: "2026-03-12", end: "2026-03-15" }],
+  "Hyundai i20": [{ start: "2026-02-26", end: "2026-03-01" }],
+  "Skoda Octavia": [{ start: "2026-02-22", end: "2026-02-25" }],
+  "Volkswagen Passat": [{ start: "2026-03-10", end: "2026-03-14" }],
+  "Nissan Qashqai": [{ start: "2026-02-19", end: "2026-02-21" }],
+  "Kia Sportage": [{ start: "2026-03-02", end: "2026-03-06" }],
+  "Mercedes C-Class": [{ start: "2026-02-27", end: "2026-03-02" }]
+};
 
 const translations = {
   en: {
     navWhyUs: "Why Us",
     navHow: "How It Works",
+    navFleet: "Fleet",
     navBook: "Book Now",
     navReviews: "Reviews",
     navContact: "Contact",
@@ -79,6 +98,7 @@ const translations = {
   tr: {
     navWhyUs: "Neden Biz",
     navHow: "Nasıl Çalışır",
+    navFleet: "Filo",
     navBook: "Hemen Rezervasyon",
     navReviews: "Yorumlar",
     navContact: "İletişim",
@@ -199,7 +219,7 @@ const runWhenIdle = (callback) => {
 
 const initRevealAnimations = () => {
   const revealTargets = document.querySelectorAll(
-    ".hero-copy, .hero-card, .feature-card, .steps article, .lead-form, .reviews-grid blockquote, .contact-copy, .contact-card"
+    ".hero-copy, .hero-card, .feature-card, .steps article, .trust-card, .pricing-card, .fleet-card, .lead-form, .reviews-grid blockquote, .contact-copy, .contact-card"
   );
 
   if (!revealTargets.length) {
@@ -244,6 +264,135 @@ const smoothScrollToId = (targetId) => {
   window.scrollTo({ top: topPosition, behavior: "smooth" });
 };
 
+const parseLocalDate = (value) => {
+  if (!value) {
+    return null;
+  }
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
+const getSelectedDailyRate = () => {
+  if (!carTypeSelect) {
+    return 0;
+  }
+  const selectedOption = carTypeSelect.options[carTypeSelect.selectedIndex];
+  const rate = Number(selectedOption?.dataset?.rate || 0);
+  return Number.isFinite(rate) ? rate : 0;
+};
+
+const calculateRentalDays = () => {
+  const pickupDate = parseLocalDate(pickupDateInput?.value);
+  const returnDate = parseLocalDate(returnDateInput?.value);
+
+  if (!pickupDate || !returnDate) {
+    return 0;
+  }
+
+  const diffMs = returnDate.getTime() - pickupDate.getTime();
+  const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  return days > 0 ? days : 0;
+};
+
+const applyLongTermDiscount = (subtotal, days) => {
+  if (days >= 30) {
+    return subtotal * 0.82;
+  }
+  if (days >= 14) {
+    return subtotal * 0.88;
+  }
+  if (days >= 7) {
+    return subtotal * 0.92;
+  }
+  return subtotal;
+};
+
+const hasDateOverlap = (startDate, endDate, range) => {
+  const blockStart = parseLocalDate(range.start);
+  const blockEnd = parseLocalDate(range.end);
+  if (!blockStart || !blockEnd) {
+    return false;
+  }
+  return startDate <= blockEnd && endDate >= blockStart;
+};
+
+const formatUnavailableRanges = (carName) => {
+  const ranges = unavailableRangesByCar[carName] || [];
+  if (!ranges.length) {
+    return "No blocked dates currently for this car.";
+  }
+  return ranges.map((range) => `${range.start} to ${range.end}`).join(" · ");
+};
+
+const updateBookingEstimate = () => {
+  const dailyRate = getSelectedDailyRate();
+  const days = calculateRentalDays();
+  const subtotal = dailyRate * days;
+  const finalTotal = applyLongTermDiscount(subtotal, days);
+
+  if (dailyPriceInput) {
+    dailyPriceInput.value = `€${dailyRate}/day`;
+  }
+
+  if (estimatedTotalInput) {
+    estimatedTotalInput.value = `€${Math.round(finalTotal)}`;
+  }
+
+  const carName = carTypeSelect?.value;
+  const pickupDate = parseLocalDate(pickupDateInput?.value);
+  const returnDate = parseLocalDate(returnDateInput?.value);
+  const carRanges = unavailableRangesByCar[carName] || [];
+
+  if (!carName) {
+    if (availabilityInfo) {
+      availabilityInfo.textContent = "Select a car and dates to check availability.";
+    }
+    if (leadSubmitButton) {
+      leadSubmitButton.disabled = false;
+    }
+    return;
+  }
+
+  if (!pickupDate || !returnDate) {
+    if (availabilityInfo) {
+      availabilityInfo.textContent = `Unavailable dates: ${formatUnavailableRanges(carName)}`;
+    }
+    if (leadSubmitButton) {
+      leadSubmitButton.disabled = false;
+    }
+    return;
+  }
+
+  if (returnDate <= pickupDate) {
+    if (availabilityInfo) {
+      availabilityInfo.textContent = "Return date must be after pickup date.";
+    }
+    if (leadSubmitButton) {
+      leadSubmitButton.disabled = true;
+    }
+    return;
+  }
+
+  const hasConflict = carRanges.some((range) => hasDateOverlap(pickupDate, returnDate, range));
+
+  if (hasConflict) {
+    if (availabilityInfo) {
+      availabilityInfo.textContent = `Selected dates are unavailable for ${carName}. Blocked ranges: ${formatUnavailableRanges(carName)}`;
+    }
+    if (leadSubmitButton) {
+      leadSubmitButton.disabled = true;
+    }
+    return;
+  }
+
+  if (availabilityInfo) {
+    availabilityInfo.textContent = `${carName} is available for the selected dates. Estimated total: €${Math.round(finalTotal)}.`;
+  }
+  if (leadSubmitButton) {
+    leadSubmitButton.disabled = false;
+  }
+};
+
 if (yearElement) {
   yearElement.textContent = new Date().getFullYear();
 }
@@ -261,12 +410,59 @@ const initialLanguage = savedLanguage === "tr" || savedLanguage === "en"
 applyLanguage(initialLanguage);
 runWhenIdle(initRevealAnimations);
 
+if (pickupDateInput && returnDateInput) {
+  const today = new Date().toISOString().split("T")[0];
+  pickupDateInput.min = today;
+  returnDateInput.min = today;
+
+  pickupDateInput.addEventListener("change", () => {
+    returnDateInput.min = pickupDateInput.value || today;
+    updateBookingEstimate();
+  });
+
+  returnDateInput.addEventListener("change", updateBookingEstimate);
+}
+
+if (carTypeSelect) {
+  carTypeSelect.addEventListener("change", updateBookingEstimate);
+}
+
+bookCarButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const carName = button.dataset.car;
+    if (carTypeSelect && carName) {
+      carTypeSelect.value = carName;
+    }
+    updateBookingEstimate();
+    smoothScrollToId("#book-now");
+  });
+});
+
+updateBookingEstimate();
+
+const urlParams = new URLSearchParams(window.location.search);
+const preselectedCar = urlParams.get("car");
+if (preselectedCar && carTypeSelect) {
+  const hasOption = Array.from(carTypeSelect.options).some((option) => option.value === preselectedCar);
+  if (hasOption) {
+    carTypeSelect.value = preselectedCar;
+    updateBookingEstimate();
+  }
+}
+
 if (leadForm) {
   leadForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    if (leadSubmitButton?.disabled) {
+      return;
+    }
+
     const formData = new FormData(leadForm);
     const currentLanguage = localStorage.getItem(storageLanguageKey) === "tr" ? "tr" : "en";
+    const dailyRate = getSelectedDailyRate();
+    const rentalDays = calculateRentalDays();
+    const estimatedTotal = Math.round(applyLongTermDiscount(dailyRate * rentalDays, rentalDays));
     const labels = {
       en: {
         title: "New rental request",
@@ -276,6 +472,9 @@ if (leadForm) {
         returnDate: "Return date",
         pickupLocation: "Pickup location",
         carType: "Car type",
+        dailyRate: "Daily rate",
+        rentalDays: "Rental days",
+        estimatedTotal: "Estimated total",
         notes: "Notes"
       },
       tr: {
@@ -286,6 +485,9 @@ if (leadForm) {
         returnDate: "Dönüş tarihi",
         pickupLocation: "Teslim alma konumu",
         carType: "Araç tipi",
+        dailyRate: "Günlük ücret",
+        rentalDays: "Kiralama günü",
+        estimatedTotal: "Tahmini toplam",
         notes: "Notlar"
       }
     };
@@ -299,6 +501,9 @@ if (leadForm) {
       `${i18n.returnDate}: ${formData.get("returnDate") || "-"}`,
       `${i18n.pickupLocation}: ${formData.get("pickupLocation") || "-"}`,
       `${i18n.carType}: ${formData.get("carType") || "-"}`,
+      `${i18n.dailyRate}: €${dailyRate}/day`,
+      `${i18n.rentalDays}: ${rentalDays || 0}`,
+      `${i18n.estimatedTotal}: €${estimatedTotal || 0}`,
       `${i18n.notes}: ${formData.get("notes") || "-"}`
     ].join("\n");
 
